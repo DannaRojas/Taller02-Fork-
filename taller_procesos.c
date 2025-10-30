@@ -1,15 +1,17 @@
 /**********************************************************
-*            Pontificia Universidad Javeriana             *
-*                         ---=---                         *
-*                                                         *
-* Autores: - Danna Gabriela Rojas Bernal                  *
-*          - Juan David Daza Caro                         *
-* Fecha: 30 Octubre de 2025                               *
-* Docente: J. Corredor                                    *
-* Objetivo: Aplicar los conceptos de procesos    	  *
-*	    comunicación entre procesos                   *
-*                                                         *
-* Descripción:                                            *
+*            Pontificia Universidad Javeriana              * 
+*                         ---=---                          *
+*                                                          *
+* Autores: - Danna Gabriela Rojas Bernal                   *
+*          - Juan David Daza Caro                          * 
+* Fecha: 30 Octubre de 2025                                *
+* Docente: J. Corredor                                     *
+* Objetivo: Aplicar los conceptos de procesos    	       *
+*	    comunicación entre procesos                        *
+*                                                          *
+* Descripción:  Programa que utiliza procesos (pipes)      *
+*              para leer números de dos archivos, calcular *
+*              sus sumas parciales y la suma total.        *                                    *
 ***********************************************************/
 
 
@@ -19,14 +21,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
-
+//funicion para leer archivo y verificar si se abrio 
 int* leer_archivo(char *nombre, int n) {
-    FILE *arch = fopen(nombre, "r");
+    FILE *arch = fopen(nombre, "r"); // abrir archivo en modo lectura
     if  (arch == NULL) {
         printf("Error al abrir el archivo.\n");
         exit(1);
     } 
-      
 
     int *arr = (int*) malloc(n * sizeof(int));//crea memoria dinamica para guardar  n numeros enteros 
     for (int i = 0; i < n; i++) {
@@ -36,29 +37,45 @@ int* leer_archivo(char *nombre, int n) {
     return arr;
 }
 
+//funcion con algoritmo basico de suma de arreglos
+int suma_arreglo(int *arr, int n) {
+    int suma = 0;
+    for (int i = 0; i < n; i++){
+          suma += arr[i];
+        }
+    return suma;
+}
+//declaracion de las funciones
 int* leer_archivo(char *nombre, int n);
 int suma_arreglo(int *arr, int n);
 
 int main(int argc, char *argv[]) {
-    if (argc != 5) {
+    if (argc != 5) { //verifica el paso de argumentos
 	printf("Uso: %s N1 archivo00 N2 archivo01\n", argv[0]);
     return 0;
 	}
+	 // Conversión de los argumentos tipo texto a enteros
     int N1 = atoi(argv[1]);
     int N2 = atoi(argv[3]);
+	 // Leer los archivos con la cantidad de datos indicada
     int *arr1 = leer_archivo(argv[2], N1);
     int *arr2 = leer_archivo(argv[4], N2);
 
-        int pipefd1[2],pipefd2[2],pipefdTotal[2];
+	// Declaración de tres pipes para la comunicación entre procesos
+	 int pipefd1[2],pipefd2[2],pipefdTotal[2];
         
-
+	//verificar que todos los pipes se creen correctamente
         if(pipe(pipefd1)==-1 || pipe(pipefd2) == -1 || pipe(pipefdTotal) == -1){
            perror("PIPE");
                 exit(EXIT_FAILURE);
         }
+	
+	// Declaración de variables para los tres procesos
 	pid_t pid1, pid2, pidTotal;
-        // proceso 1
-	pid1 = fork();
+
+
+//Porceso 1
+	pid1 = fork();//crea primer proceso hijo 
         if(pid1 == 0){
 	close(pipefd1[0]); // cerrar lectura
         int suma01 = suma_arreglo(arr1, N1);
@@ -66,7 +83,7 @@ int main(int argc, char *argv[]) {
         close(pipefd1[1]); // cerrar escritura
         free(arr1);
         free(arr2);
-        exit(0);
+        exit(0);//finaliza hijo 
     }else{
 	close(pipefd1[1]); // cerrar escritura (el padre solo lee)
         waitpid(pid1, NULL, 0); // esperar a que el hijo termine
@@ -76,7 +93,7 @@ int main(int argc, char *argv[]) {
         printf("Suma del archivo %s: %d\n", argv[2], sumaA);
      
 //proceso 2
-	pid2 = fork();
+	pid2 = fork();//crea segundo proceso hijo 
         if (pid2 == 0) {
         close(pipefd2[0]);
         int suma02 = suma_arreglo(arr2, N2);
@@ -116,19 +133,10 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
+//liberar memoria utilizada en el proceso padre
   free(arr1);
   free(arr2);
   return 0;
 
-}
-//funcion con algoritmo basico de suma de arreglos
-
-int suma_arreglo(int *arr, int n) {
-    int suma = 0;
-    for (int i = 0; i < n; i++){
-          suma += arr[i];
-        }
-    return suma;
 }
 
