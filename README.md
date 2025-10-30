@@ -4,7 +4,7 @@
 Este programa en C demuestra el uso de procesos y comunicación mediante pipes.
 Lee dos archivos con números enteros, calcula la suma de cada archivo usando procesos hijos, y finalmente obtiene la suma total a través de un tercer proceso.
 
-# Ejecución
+## Ejecución
 ./taller_procesos N1 archivo1 N2 archivo2
 
 Donde:
