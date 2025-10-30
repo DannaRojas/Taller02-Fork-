@@ -1,0 +1,20 @@
+############################################################################################
+#
+#                                                Makefile
+#
+# Descripcion:# Este Makefile compila el programa taller_procesos.c usando GCC.
+# Permite ejecutar fácilmente la compilación con el comando 'make'
+# y limpiar los archivos generados con 'make clean'.
+############################################################################################
+
+GCC = gcc
+FLAGS =
+MODULO =
+
+PROGRAMAS= taller_procesos
+
+taller_procesos:
+	$(GCC) $@.c -o $@
+
+clean:
+	$(RM) $(PROGRAMAS)
