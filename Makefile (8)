@@ -1,20 +1,34 @@
-############################################################################################
-#
-#                                                Makefile
-#
-# Descripcion:# Este Makefile compila el programa taller_procesos.c usando GCC.
-# Permite ejecutar fácilmente la compilación con el comando 'make'
-# y limpiar los archivos generados con 'make clean'.
-############################################################################################
+#**************************************************************
+#          Pontificia Universidad Javeriana
+#  Materia: Sistemas Operativos
+#  Tema: Taller de comunicacion entre procesos  
+# Autores: Juan David Daza - Danna Gabriela Rojas
+#  Archivo: Makefile
+#**************************************************************
 
-GCC = gcc
-FLAGS =
-MODULO =
+# Compilador y flags
+CC = gcc
+CFLAGS = -Wall 
 
-PROGRAMAS= taller_procesos
+# Archivos fuente y ejecutables
+SOURCES = taller_procesos.c
+OBJECTS = $(SOURCES:.c=.o)
+PROGRAMS = taller_procesos
 
-taller_procesos:
-	$(GCC) $@.c -o $@
+# Target por defecto
+all: $(PROGRAMS)
 
+# Compilar el programa
+$(PROGRAMS): $(OBJECTS)
+	$(CC) $(CFLAGS) $^ -o $@ 
+
+# Compilar archivos objeto
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Limpiar archivos generados
 clean:
-	$(RM) $(PROGRAMAS)
+	$(RM) $(PROGRAMS) $(OBJECTS)
+
+# Reconstruir desde cero
+rebuild: clean all
